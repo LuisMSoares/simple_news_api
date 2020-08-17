@@ -1,13 +1,33 @@
 import pymongo
-import json
-from flask_restful import Resource, reqparse
-from bson import json_util
-from app import db, get_next_sequence
+from flask_restful import Resource, reqparse, fields, marshal
+from datetime import datetime
+from bson.objectid import ObjectId
+from app.resources.types import ObjectIdType
+from app import db
 
+
+posts_field = {
+    '_id': fields.String(attribute=lambda x: x['_id']),
+    'title': fields.String(),
+    'content': fields.String(),
+    'created_at': fields.DateTime(dt_format='iso8601'),
+    'modified_at': fields.DateTime(dt_format='iso8601'),
+    'author': {
+        '_id': fields.String(attribute=lambda x: x['author_data'][0]['_id']),
+        'name': fields.String(attribute=lambda x: x['author_data'][0]['name'])
+    }
+}
+delete_posts_field = {
+    '_id': fields.String(attribute=lambda x: x['_id']),
+    'title': fields.String(),
+    'content': fields.String(),
+    'created_at': fields.DateTime(dt_format='iso8601'),
+    'modified_at': fields.DateTime(dt_format='iso8601')
+}
 
 post_parser = reqparse.RequestParser()
-post_parser.add_argument('author_id', type=int, required=True, location=['json'],
-                            help='author_id parameter is required')
+post_parser.add_argument('author', type=ObjectIdType(), required=True, location=['json'],
+                            help='a valid author_id parameter is required')
 post_parser.add_argument('title', type=str, required=True, location=['json'],
                             help='title parameter is required')
 post_parser.add_argument('content', type=str, required=True, location=['json'],
@@ -23,9 +43,9 @@ class PostResource(Resource):
             {'$match': match},
             {'$lookup': {
                 'from': 'author',
-                'localField': 'author_id',
+                'localField': 'author',
                 'foreignField': '_id',
-                'as': 'author'}}
+                'as': 'author_data'}}
         ]))
         if len(data) == 1:
             return data[0]
@@ -35,49 +55,70 @@ class PostResource(Resource):
         title_args = post_title_query_parser.parse_args().get('title')
         if title_args:
             posts_result = self._post_aggregate({'title': title_args})
+            posts_result = marshal(posts_result, posts_field)
         
         elif post_id:
-            posts_result = self._post_aggregate({'_id': post_id})
+            if not ObjectIdType.validate_objectid_type(post_id):
+                return {"message": "'{}' is not a valid id".format(post_id)}, 400
+            posts_result = self._post_aggregate({'_id': ObjectId(post_id)})
+            posts_result = marshal(posts_result, posts_field)
         
         else:
             post_id = [id['_id'] for id in db.posts.find()]
             posts_result = []
             for id in post_id:
-                posts_result.append(self._post_aggregate({'_id': id}))
+                post = self._post_aggregate({'_id': id})
+                post = marshal(post, posts_field)
+                posts_result.append(post)
+        
+        if not posts_result:
+            return {"message": "posts not found"}, 404
 
-        return json.loads(json_util.dumps(posts_result)), 200
+        return posts_result, 200
 
     def post(self):
         data = post_parser.parse_args()
-        author = db.author.find_one({'_id': data['author_id']})
+        author = db.author.find_one({'_id': ObjectId(data['author'])})
         if not author:
-            return {"message": "author id not found"}, 404
+            return {"message": "author not found"}, 404
 
-        data['_id'] = get_next_sequence(db.post_autoincrement_counter,"post_id")
-        data['author_id'] = author['_id']
-
+        data['author'] = ObjectId(author['_id'])
+        data['created_at'] = datetime.now()
+        data['modified_at'] = datetime.now()
         db.posts.insert_one(data)
-        return json.loads(json_util.dumps(data)), 201
 
-    def put(self, post_id):
+        data['author_data'] = [author]
+        
+        return marshal(data, posts_field), 201
+
+    def put(self, post_id=None):
+        if not ObjectIdType.validate_objectid_type(post_id):
+            return {"message": "'{}' is not a valid id".format(post_id)}, 400
+
         data = post_parser.parse_args()
-        author = db.author.find_one({'_id': data['author_id']})
+        author = db.author.find_one({'_id': ObjectId(data['author'])})
         if not author:
-            return {"message": "author id not found"}, 404
-
+            return {"message": "author not found"}, 404
+        
+        data['author'] = ObjectId(author['_id'])
+        data['modified_at'] = datetime.now()
         post = db.posts.find_one_and_update(
-            {'_id': post_id},
+            {'_id': ObjectId(post_id)},
             {'$set': data},
             return_document=pymongo.ReturnDocument.AFTER
         )
         
         if not post:
-            return {"message": "post not found"}, 404
+            return {"message": "posts not found"}, 404
 
-        return json.loads(json_util.dumps(post)), 200
+        post['author_data'] = [author]
+        return marshal(post, posts_field), 200
 
-    def delete(self, post_id):
-        data = db.posts.find_one_and_delete({'_id': post_id})
+    def delete(self, post_id=None):
+        if not ObjectIdType.validate_objectid_type(post_id):
+            return {"message": "'{}' is not a valid id".format(post_id)}, 400
+
+        data = db.posts.find_one_and_delete({'_id': ObjectId(post_id)})
         if not data:
-            return {"message": "post not found"}, 404
-        return json.loads(json_util.dumps(data)), 200
+            return {"message": "posts not found"}, 404
+        return marshal(data, delete_posts_field), 200
