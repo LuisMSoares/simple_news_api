@@ -22,7 +22,7 @@ parameters:
           type: "string"
           example: "Laoreet non curabitur gravida arcu. Proin sed libero enim sed faucibus turpis in eu. Sed vulputate odio ut enim blandit volutpat maecenas. Scelerisque eu ultrices vitae auctor eu augue ut lectus arcu. Lectus nulla at volutpat diam. Quisque egestas diam in arcu cursus euismod. Amet porttitor eget dolor morbi non arcu. Integer eget aliquet nibh praesent. In hac habitasse platea dictumst. Blandit volutpat maecenas volutpat blandit aliquam etiam. Hac habitasse platea dictumst quisque sagittis purus sit amet."
 responses:
-  201:
+  200:
     description: Post updated
   400:
     description: Bad request

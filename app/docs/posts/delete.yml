@@ -10,5 +10,7 @@ parameters:
 responses:
   200:
     description: Post deleted
+  400:
+    description: Bad request
   404:
     description: Post not found
