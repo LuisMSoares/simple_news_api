@@ -1,0 +1,15 @@
+Finds all posts registered
+---
+tags:
+  - Posts
+parameters:
+  - name: title
+    in: query
+    description: "Insert the post title what you want to find"
+    required: false
+responses:
+  200:
+    description: A list of posts or a single post result
+  404:
+    description: There no post registered
+

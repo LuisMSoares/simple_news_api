@@ -1,0 +1,30 @@
+Update a post
+---
+tags:
+  - Posts
+parameters:
+  - name: Posts
+    in: body
+    schema:
+      type: object
+      required:
+        - author
+        - title
+        - content
+      properties:
+        author:
+          type: "string"
+          example: "A Valid Author ObjectId"
+        title:
+          type: "string"
+          example: "Lorem ipsum Interdum"
+        content:
+          type: "string"
+          example: "Laoreet non curabitur gravida arcu. Proin sed libero enim sed faucibus turpis in eu. Sed vulputate odio ut enim blandit volutpat maecenas. Scelerisque eu ultrices vitae auctor eu augue ut lectus arcu. Lectus nulla at volutpat diam. Quisque egestas diam in arcu cursus euismod. Amet porttitor eget dolor morbi non arcu. Integer eget aliquet nibh praesent. In hac habitasse platea dictumst. Blandit volutpat maecenas volutpat blandit aliquam etiam. Hac habitasse platea dictumst quisque sagittis purus sit amet."
+responses:
+  201:
+    description: Post updated
+  400:
+    description: Bad request
+  404:
+    description: Post or Author not found

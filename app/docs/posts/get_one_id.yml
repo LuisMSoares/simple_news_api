@@ -1,0 +1,14 @@
+Finds a post registered
+---
+tags:
+  - Posts
+parameters:
+  - name: post_id
+    in: path
+    description: "Insert the valid post ObjectID"
+    required: true
+responses:
+  200:
+    description: A single post item
+  404:
+    description: Post not found

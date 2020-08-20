@@ -1,0 +1,16 @@
+Finds a althor registered
+---
+tags:
+  - Authors
+parameters:
+  - name: author_id
+    in: path
+    description: "Insert the valid author ObjectID"
+    required: true
+responses:
+  200:
+    description: A single author item
+  400:
+    description: Invalid ObjectID in the path
+  404:
+    description: Author not found

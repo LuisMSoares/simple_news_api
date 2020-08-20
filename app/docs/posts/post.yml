@@ -1,0 +1,30 @@
+Create a new post
+---
+tags:
+  - Posts
+parameters:
+  - name: Posts
+    in: body
+    schema:
+      type: object
+      required:
+        - author
+        - title
+        - content
+      properties:
+        author:
+          type: "string"
+          example: "A Valid Author ObjectId"
+        title:
+          type: "string"
+          example: "Lorem ipsum Interdum curabitur donec"
+        content:
+          type: "string"
+          example: "Interdum velit laoreet id donec ultrices. Laoreet non curabitur gravida arcu. Proin sed libero enim sed faucibus turpis in eu. Eget gravida cum sociis natoque penatibus. Sed vulputate odio ut enim blandit volutpat maecenas. Scelerisque eu ultrices vitae auctor eu augue ut lectus arcu. Lectus nulla at volutpat diam. Quisque egestas diam in arcu cursus euismod. Amet porttitor eget dolor morbi non arcu. Integer eget aliquet nibh praesent. In hac habitasse platea dictumst. Blandit volutpat maecenas volutpat blandit aliquam etiam. Hac habitasse platea dictumst quisque sagittis purus sit amet. Amet facilisis magna etiam tempor orci eu lobortis."
+responses:
+  201:
+    description: Post created
+  400:
+    description: Bad request
+  404:
+    description: Author not found

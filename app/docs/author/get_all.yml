@@ -1,0 +1,9 @@
+Finds all author registered
+---
+tags:
+  - Authors
+responses:
+  200:
+    description: A list of authors
+  404:
+    description: There no author registered

@@ -1,0 +1,20 @@
+Create a new author
+---
+tags:
+  - Authors
+parameters:
+  - name: Author
+    in: body
+    schema:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          example: "Ipsum lorem"
+responses:
+  201:
+    description: author created
+  400:
+    description: Bad request

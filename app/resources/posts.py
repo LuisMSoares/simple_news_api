@@ -1,5 +1,6 @@
 import pymongo
 from flask_restful import Resource, reqparse, fields, marshal
+from flasgger import swag_from
 from datetime import datetime
 from bson.objectid import ObjectId
 from app.resources.types import ObjectIdType
@@ -51,6 +52,8 @@ class PostResource(Resource):
             return data[0]
         return data
 
+    @swag_from('../docs/posts/get_all.yml', endpoint='posts_post_and_get_all')
+    @swag_from('../docs/posts/get_one_id.yml', endpoint='posts_get_one_put_delete')
     def get(self, post_id=None):
         title_args = post_title_query_parser.parse_args().get('title')
         if title_args:
@@ -76,6 +79,7 @@ class PostResource(Resource):
 
         return posts_result, 200
 
+    @swag_from('../docs/posts/post.yml', endpoint='posts_post_and_get_all')
     def post(self):
         data = post_parser.parse_args()
         author = db.author.find_one({'_id': ObjectId(data['author'])})
@@ -91,6 +95,7 @@ class PostResource(Resource):
         
         return marshal(data, posts_field), 201
 
+    @swag_from('../docs/posts/put.yml', endpoint='posts_get_one_put_delete')
     def put(self, post_id=None):
         if not ObjectIdType.validate_objectid_type(post_id):
             return {"message": "'{}' is not a valid id".format(post_id)}, 400
@@ -114,6 +119,7 @@ class PostResource(Resource):
         post['author_data'] = [author]
         return marshal(post, posts_field), 200
 
+    @swag_from('../docs/posts/delete.yml', endpoint='posts_get_one_put_delete')
     def delete(self, post_id=None):
         if not ObjectIdType.validate_objectid_type(post_id):
             return {"message": "'{}' is not a valid id".format(post_id)}, 400

@@ -1,0 +1,14 @@
+Remove a post registered
+---
+tags:
+  - Posts
+parameters:
+  - name: post_id
+    in: path
+    description: "Insert the valid post ObjectID"
+    required: true
+responses:
+  200:
+    description: Post deleted
+  404:
+    description: Post not found
