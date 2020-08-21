@@ -53,6 +53,7 @@ class PostResource(Resource):
         return data
 
     @swag_from('../docs/posts/get_all.yml', endpoint='posts_post_and_get_all')
+    @swag_from('../docs/posts/get_all_by_title.yml', endpoint='posts_by_title')
     @swag_from('../docs/posts/get_one_id.yml', endpoint='posts_get_one_put_delete')
     def get(self, post_id=None):
         title_args = post_title_query_parser.parse_args().get('title')

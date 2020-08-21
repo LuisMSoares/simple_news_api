@@ -6,6 +6,11 @@ from flasgger import Swagger
 
 
 app = Flask(__name__)
+app.config['SWAGGER'] = {
+    'title': 'News Api',
+    'version': '1.0.0',
+    'specs_route': '/docs/'
+}
 swag = Swagger(app)
 api = Api(app)
 api.prefix = '/api'
@@ -21,4 +26,5 @@ api.add_resource(AuthorResource, '/authors/<author_id>', endpoint='author_get_on
 api.add_resource(AuthorResource, '/authors', endpoint='author_post_and_get_all')
 
 api.add_resource(PostResource, '/posts/<post_id>', endpoint='posts_get_one_put_delete')
-api.add_resource(PostResource, '/posts', '/posts/', endpoint='posts_post_and_get_all')
+api.add_resource(PostResource, '/posts', endpoint='posts_post_and_get_all')
+api.add_resource(PostResource, '/posts/', endpoint='posts_by_title')
